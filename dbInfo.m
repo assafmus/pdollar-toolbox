@@ -73,7 +73,8 @@ if(~isempty(setId)), setIds=setIds(setId); vidIds=vidIds(setId); end
 if(~isempty(vidId)), vidIds={vidIds{1}(vidId)}; end
 
 % actual directory where data is contained
-pth=fileparts(mfilename('fullpath'));
+% pth=fileparts(mfilename('fullpath'));
+pth='/home/assaf/datasets/caltech';
 pth=[pth filesep 'data-' subdir];
 
 end
