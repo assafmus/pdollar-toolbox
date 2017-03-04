@@ -150,7 +150,7 @@ plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
 lims = [2e-4 50 .035 1];  % axis limits for ROC plots
 bbsShow = 0;              % if true displays sample bbs for each alg/exp
-bbsType = 'fp';           % type of bbs to display (fp/tp/fn/dt)
+bbsType = 'fn';           % type of bbs to display (fp/tp/fn/dt)
 saveFiles = false;
 
 algs0=algs; bnds0=bnds;
