@@ -28,23 +28,24 @@ function dbEval(name)
 %  filter   - expanded filtering (see 3.3 in PAMI11)
 exps = {
     'Reasonable',     [50 inf],  [.65 inf], 0,   .5,  1.25
-    'All',            [20 inf],  [.2 inf],  0,   .5,  1.25
-    'Scale=large',    [100 inf], [inf inf], 0,   .5,  1.25
-    'Scale=near',     [80 inf],  [inf inf], 0,   .5,  1.25
-    'Scale=medium',   [30 80],   [inf inf], 0,   .5,  1.25
-    'Scale=far',      [20 30],   [inf inf], 0,   .5,  1.25
-    'Occ=none',       [50 inf],  [inf inf], 0,   .5,  1.25
-    'Occ=partial',    [50 inf],  [.65 1],   0,   .5,  1.25
-    'Occ=heavy',      [50 inf],  [.2 .65],  0,   .5,  1.25
-    'Ar=all',         [50 inf],  [inf inf], 0,   .5,  1.25
-    'Ar=typical',     [50 inf],  [inf inf],  .1, .5,  1.25
-    'Ar=atypical',    [50 inf],  [inf inf], -.1, .5,  1.25
-    'Overlap=25',     [50 inf],  [.65 inf], 0,   .25, 1.25
-    'Overlap=50',     [50 inf],  [.65 inf], 0,   .50, 1.25
-    'Overlap=75',     [50 inf],  [.65 inf], 0,   .75, 1.25
-    'Expand=100',     [50 inf],  [.65 inf], 0,   .5,  1.00
-    'Expand=125',     [50 inf],  [.65 inf], 0,   .5,  1.25
-    'Expand=150',     [50 inf],  [.65 inf], 0,   .5,  1.50 };
+%     'All',            [20 inf],  [.2 inf],  0,   .5,  1.25
+%     'Scale=large',    [100 inf], [inf inf], 0,   .5,  1.25
+%     'Scale=near',     [80 inf],  [inf inf], 0,   .5,  1.25
+%     'Scale=medium',   [30 80],   [inf inf], 0,   .5,  1.25
+%     'Scale=far',      [20 30],   [inf inf], 0,   .5,  1.25
+%     'Occ=none',       [50 inf],  [inf inf], 0,   .5,  1.25
+%     'Occ=partial',    [50 inf],  [.65 1],   0,   .5,  1.25
+%     'Occ=heavy',      [50 inf],  [.2 .65],  0,   .5,  1.25
+%     'Ar=all',         [50 inf],  [inf inf], 0,   .5,  1.25
+%     'Ar=typical',     [50 inf],  [inf inf],  .1, .5,  1.25
+%     'Ar=atypical',    [50 inf],  [inf inf], -.1, .5,  1.25
+%     'Overlap=25',     [50 inf],  [.65 inf], 0,   .25, 1.25
+%     'Overlap=50',     [50 inf],  [.65 inf], 0,   .50, 1.25
+%     'Overlap=75',     [50 inf],  [.65 inf], 0,   .75, 1.25
+%     'Expand=100',     [50 inf],  [.65 inf], 0,   .5,  1.00
+%     'Expand=125',     [50 inf],  [.65 inf], 0,   .5,  1.25
+%     'Expand=150',     [50 inf],  [.65 inf], 0,   .5,  1.50 
+};
 exps=cell2struct(exps',{'name','hr','vr','ar','overlap','filter'});
 
 % List of algorithms: { name, resize, color, style }
@@ -119,6 +120,7 @@ algs = {
 %     %   'CompACT-Deep',     0, clrs(55,:),  '--'
 %     'SCF+AlexNet',      0, clrs(56,:),  '-'
 %     'SA-FastRCNN',      0, clrs(57,:),  '--'
+    'RPN+BF',      0, clrs(57,:),  '-'
     };
 
 if nargin >= 1
@@ -138,7 +140,7 @@ dataNames = {'UsaTest','UsaTrain','InriaTest',...
 
 % select databases, experiments and algorithms for evaluation
 dataNames = dataNames(1); % select one or more databases for evaluation
-exps = exps(1);           % select one or more experiment for evaluation
+exps = exps(:);           % select one or more experiment for evaluation
 algs = algs(:);           % select one or more algorithms for evaluation
 
 % remaining parameters and constants
@@ -150,7 +152,7 @@ plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
 lims = [2e-4 50 .035 1];  % axis limits for ROC plots
 bbsShow = 0;              % if true displays sample bbs for each alg/exp
-bbsType = 'fn';           % type of bbs to display (fp/tp/fn/dt)
+bbsType = 'fp';           % type of bbs to display (fp/tp/fn/dt)
 saveFiles = false;
 
 algs0=algs; bnds0=bnds;
@@ -253,13 +255,15 @@ for p=1:nPlots
         for g=1:nGt, lgd1{g}=sprintf('%2i%% %s',scores1(g,p),stre{g}); end
         colors1=uniqueColors(1,max(10,nGt)); styles1=repmat({'-','--'},1,nGt);
     else
+        colors1=colors; styles1=styles;
         xs1=xs(p,:); ys1=ys(p,:); fName1=[fName sprintf('_%03d_',p) stre{p}]; lgd1=stra;
         for d=1:nDt, lgd1{d}=sprintf('%2i%% %s',scores1(p,d),stra{d}); end
         kp=[find(strcmp(stra,'VJ')) find(strcmp(stra,'HOG')) 1 1];
         [~,ord]=sort(scores(p,:)); kp=ord==kp(1)|ord==kp(2);
         j=find(cumsum(~kp)>=plotNum-2); kp(1:j(1))=1; ord=fliplr(ord(kp));
-        xs1=xs1(ord); ys1=ys1(ord); lgd1=lgd1(ord); colors1=colors(ord,:);
-        styles1=styles(ord); f=fopen([fName1 '.txt'],'w');
+%         xs1=xs1(ord); ys1=ys1(ord); lgd1=lgd1(ord); colors1=colors(ord,:);
+%         styles1=styles(ord); 
+        f=fopen([fName1 '.txt'],'w');
         for d=1:nDt, fprintf(f,'%s %f\n',stra{d},scores(p,d)); end; fclose(f);
     end
     % plot curves and finalize display
