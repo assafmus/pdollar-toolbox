@@ -122,12 +122,18 @@ algs = {
     };
 
 if nargin >= 1
-    if isempty(algs)
-        c = 1;
-    else
-        c = find(~ismember(clrs, vertcat(algs{:,3}), 'rows'),1,'first');
+    if ~iscell(name),
+        name = {name};
     end
-    algs = [algs; {name, 0, clrs(c,:),'-'}];
+    
+    for n = 1 : numel(name)
+        if isempty(algs)
+            c = 1;
+        else
+            c = find(~ismember(clrs, vertcat(algs{:,3}), 'rows'),1,'first');
+        end
+        algs = [algs; {name{n}, 0, clrs(c,:),'-'}];
+    end
 end
 
 algs=cell2struct(algs',{'name','resize','color','style'});
@@ -150,7 +156,7 @@ plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
 lims = [2e-4 50 .035 1];  % axis limits for ROC plots
 bbsShow = 0;              % if true displays sample bbs for each alg/exp
-bbsType = 'fn';           % type of bbs to display (fp/tp/fn/dt)
+bbsType = 'fp';           % type of bbs to display (fp/tp/fn/dt)
 saveFiles = false;
 
 algs0=algs; bnds0=bnds;
