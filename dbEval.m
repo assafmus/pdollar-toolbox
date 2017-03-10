@@ -124,12 +124,18 @@ algs = {
     };
 
 if nargin >= 1
-    if isempty(algs)
-        c = 1;
-    else
-        c = find(~ismember(clrs, vertcat(algs{:,3}), 'rows'),1,'first');
+    if ~iscell(name),
+        name = {name};
     end
-    algs = [algs; {name, 0, clrs(c,:),'-'}];
+    
+    for n = 1 : numel(name)
+        if isempty(algs)
+            c = 1;
+        else
+            c = find(~ismember(clrs, vertcat(algs{:,3}), 'rows'),1,'first');
+        end
+        algs = [algs; {name{n}, 0, clrs(c,:),'-'}];
+    end
 end
 
 algs=cell2struct(algs',{'name','resize','color','style'});
