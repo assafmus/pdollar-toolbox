@@ -28,6 +28,12 @@ function dbEval(name)
 %  filter   - expanded filtering (see 3.3 in PAMI11)
 exps = {
     'Reasonable',     [50 inf],  [.65 inf], 0,   .5,  1.25
+%     'Reasonable-overlap70',     [50 inf],  [.65 inf], 0,   .7,  1.25
+%     'Reasonable-50-70', [50 70],  [.65 inf], 0,   .5,  1.25
+%     'Reasonable-70-100', [70 100],  [.65 inf], 0,   .5,  1.25
+%     'Reasonable-100-150', [100 150],  [.65 inf], 0,   .5,  1.25
+%     'Reasonable-150-inf', [150 inf],  [.65 inf], 0,   .5,  1.25
+    
 %     'All',            [20 inf],  [.2 inf],  0,   .5,  1.25
 %     'Scale=large',    [100 inf], [inf inf], 0,   .5,  1.25
 %     'Scale=near',     [80 inf],  [inf inf], 0,   .5,  1.25
@@ -120,7 +126,7 @@ algs = {
 %     %   'CompACT-Deep',     0, clrs(55,:),  '--'
 %     'SCF+AlexNet',      0, clrs(56,:),  '-'
 %     'SA-FastRCNN',      0, clrs(57,:),  '--'
-    'RPN+BF',      0, clrs(57,:),  '-'
+    'RPN-ped',      0, clrs(57,:),  '-'
     };
 
 if nargin >= 1
@@ -156,6 +162,7 @@ plotRoc = 1;              % if true plot ROC else PR curves
 plotAlg = 0;              % if true one plot per alg else one plot per exp
 plotNum = 15;             % only show best plotNum curves (and VJ and HOG)
 samples = 10.^(-2:.25:0); % samples for computing area under the curve
+samples = 10.^(-2:.25:-1); % samples for computing area under the curve
 lims = [2e-4 50 .035 1];  % axis limits for ROC plots
 bbsShow = 0;              % if true displays sample bbs for each alg/exp
 bbsType = 'fp';           % type of bbs to display (fp/tp/fn/dt)
