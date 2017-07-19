@@ -210,8 +210,9 @@ function [objs,bbs] = bbLoad( fName, varargin )
 
 % get parameters
 df={'format',0,'ellipse',1,'squarify',[],'lbls',[],'ilbls',[],'hRng',[],...
-  'wRng',[],'aRng',[],'arRng',[],'oRng',[],'xRng',[],'yRng',[],'vRng',[]};
-[format,ellipse,sqr,lbls,ilbls,hRng,wRng,aRng,arRng,oRng,xRng,yRng,vRng]...
+  'wRng',[],'aRng',[],'arRng',[],'oRng',[],'xRng',[],'yRng',[],'vRng',[],...
+  'wPerRng', [], 'hPerRng', [], 'xPerRng',[],'yPerRng',[], 'imSize', []};
+[format,ellipse,sqr,lbls,ilbls,hRng,wRng,aRng,arRng,oRng,xRng,yRng,vRng,wPerRng,hPerRng,xPerRng,yPerRng,imSize]...
   = getPrmDflt(varargin,df,1);
 
 % load objs
@@ -293,6 +294,19 @@ if(~isempty(vRng)),  for i=1:n, o=objs(i); bb=o.bb; bbv=o.bbv; %#ok<ALIGN>
       v=(bbv(3)*bbv(4))/(bb(3)*bb(4)); end
     objs(i).ign = objs(i).ign || v<vRng(1) || v>vRng(2); end
 end
+
+if(~isempty(xPerRng)),  for i=1:n, v=objs(i).bb(1) / imSize(2);
+    objs(i).ign = objs(i).ign || v<xPerRng(1) || v>xPerRng(2); end; end
+if(~isempty(xPerRng)),  for i=1:n, v=(objs(i).bb(1)+objs(i).bb(3)) / imSize(2);
+    objs(i).ign = objs(i).ign || v<xPerRng(1) || v>xPerRng(2); end; end
+if(~isempty(yPerRng)),  for i=1:n, v=objs(i).bb(2) / imSize(1);
+    objs(i).ign = objs(i).ign || v<yPerRng(1) || v>yPerRng(2); end; end
+if(~isempty(yPerRng)),  for i=1:n, v=(objs(i).bb(2)+objs(i).bb(4)) / imSize(1);
+    objs(i).ign = objs(i).ign || v<yPerRng(1) || v>yPerRng(2); end; end
+if(~isempty(wPerRng)),  for i=1:n, v=objs(i).bb(3) / imSize(2);
+    objs(i).ign = objs(i).ign || v<wPerRng(1) || v>wPerRng(2); end; end
+if(~isempty(hPerRng)),  for i=1:n, v=objs(i).bb(4) / imSize(1);
+    objs(i).ign = objs(i).ign || v<hPerRng(1) || v>hPerRng(2); end; end
 
 % finally get extent of each bounding box (not trivial if ang~=0)
 if(nargout<=1), return; end; if(n==0), bbs=zeros(0,5); return; end
